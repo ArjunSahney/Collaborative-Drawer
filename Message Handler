@@ -1,0 +1,85 @@
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MessageHandler {
+    private Shape shape;
+    private String[] message;
+
+    public void processing(String s, Sketch sketch) {
+        shape = null;
+        message = s.split(" ");
+        String command = message[0];
+        switch (command) {
+            case "recolor":
+                int id = Integer.parseInt(message[1]);
+                sketch.recolorID(id, Integer.parseInt(message[2]));
+            case "move":
+                int shapeId = Integer.parseInt(message[1]);
+                int dx = Integer.parseInt(message[2]);
+                int dy = Integer.parseInt(message[3]);
+                sketch.moveShape(shapeId, dx, dy);
+                break;
+            case "delete":
+                int shapeIdToDelete = Integer.parseInt(message[1]);
+                sketch.removeShape(shapeIdToDelete);
+                break;
+            case "draw":
+                String shapeType = message[1];
+
+                switch (shapeType) {
+                    case "ellipse" -> {
+                        int x1 = Integer.parseInt(message[2]);
+                        int y1 = Integer.parseInt(message[3]);
+                        int width = Integer.parseInt(message[4]);
+                        int height = Integer.parseInt(message[5]);
+                        Color fillColor = new Color(Integer.parseInt(message[6]));
+                        shape = new Ellipse(x1, y1, width, height, fillColor);
+                    }
+                    case "polyline" -> {
+                        ArrayList<Point> points = new ArrayList<>();
+                        String[] xCoords = message[2].split(",");
+                        String[] yCoords = message[3].split(",");
+                        for (int i = 0; i < xCoords.length; i++) {
+                            int x = Integer.parseInt(xCoords[i]);
+                            int y = Integer.parseInt(yCoords[i]);
+                            Point point = new Point(x, y);
+                            points.add(point);
+                        }
+                        Color lineColor = new Color(Integer.parseInt(message[5]));
+                        shape = new Polyline(points, lineColor);
+                    }
+                    case "rectangle" -> {
+                        int x2 = Integer.parseInt(message[2]);
+                        int y2 = Integer.parseInt(message[3]);
+                        int width2 = Integer.parseInt(message[4]);
+                        int height2 = Integer.parseInt(message[5]);
+                        Color fillColor2 = new Color(Integer.parseInt(message[6]));
+                        shape = new Rectangle(x2, y2, width2, height2, fillColor2);
+                    }
+                    case "segment" -> {
+                        int x3 = Integer.parseInt(message[2]);
+                        int y3 = Integer.parseInt(message[3]);
+                        int x4 = Integer.parseInt(message[4]);
+                        int y4 = Integer.parseInt(message[5]);
+                        Color lineColor2 = new Color(Integer.parseInt(message[6]));
+                        shape = new Segment(x3, y3, x4, y4, lineColor2);
+                    }
+                }
+                int shapeIdToInsert = Integer.parseInt(message[7]);
+                sketch.insertID(shapeIdToInsert, shape);
+                break;
+        }
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < message.length; i++) {
+            builder.append(message[i]);
+            if (i != message.length - 1) {
+                builder.append(" ");
+            }
+        }
+        return builder.toString();
+    }
+}
