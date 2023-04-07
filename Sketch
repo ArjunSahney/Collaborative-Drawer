@@ -1,0 +1,60 @@
+import java.awt.*;
+import java.util.TreeMap;
+
+/**
+ @Author: Arjun Sahney and Caleb Ash
+ */
+public class Sketch {
+    public static TreeMap<Integer, Shape> idShape = new TreeMap<>();
+    public static int id = 0;
+
+    public synchronized Shape getID(int index) {
+        return idShape.get(index);
+    }
+
+    public synchronized int insertID(int ids, Shape s) {
+        if (ids == -1) {
+            idShape.put(id, s);
+            int temp = id;
+            id++;
+            System.out.println(id);
+            return temp;
+        } else {
+            idShape.put(ids, s);
+            return ids;
+        }
+    }
+
+
+    public synchronized int contains(Point p) {
+        for (int i : idShape.descendingKeySet()) {
+            if (idShape.get(i).contains(p.x, p.y)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static synchronized TreeMap<Integer, Shape> getMap() {
+        return idShape;
+    }
+
+    public synchronized void moveShape(int ids, int dx, int dy) {
+        Shape s = idShape.get(ids);
+        s.moveBy(dx, dy);
+        idShape.put(ids, s);
+    }
+
+    public synchronized void removeShape(int ids) {
+        idShape.remove(ids);
+    }
+
+    public synchronized void recolorID(int ids, int color) {
+        Shape s = idShape.get(ids);
+        Color c = new Color(color);
+        if (s != null) {
+            s.setColor(c);
+            idShape.put(ids, s);
+        }
+    }
+}
