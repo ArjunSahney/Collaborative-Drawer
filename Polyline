@@ -1,0 +1,97 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.util.ArrayList;
+
+public class Polyline implements Shape {
+	private final ArrayList<Point> points;
+	private int[] coordinates;
+	private Color color;
+
+	public Polyline(Point p, Color color) {
+		this.color = color;
+		points = new ArrayList<>();
+		points.add(p);
+		updateCoordinates();
+	}
+
+	public Polyline(ArrayList<Point> points, Color color) {
+		this.points = new ArrayList<>(points);
+		this.color = color;
+		updateCoordinates();
+	}
+
+	@Override
+	public void moveBy(int dx, int dy) {
+		for (Point point : points) {
+			point.x += dx;
+			point.y += dy;
+		}
+		updateCoordinates();
+	}
+
+	@Override
+	public Color getColor() {
+		return color;
+	}
+
+	@Override
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	@Override
+	public boolean contains(int x, int y) {
+		for (int i = 1; i < points.size(); i++) {
+			if (Segment.pointToSegmentDistance(x, y, points.get(i - 1).x, points.get(i - 1).y,
+					points.get(i).x, points.get(i).y) <= 5) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void setEnd(int x, int y) {
+		Point p = new Point(x, y);
+		points.add(p);
+		updateCoordinates();
+	}
+
+	@Override
+	public void draw(Graphics g) {
+		g.setColor(color);
+		int[] xCoords = new int[points.size()];
+		int[] yCoords = new int[points.size()];
+		for (int i = 0; i < points.size(); i++) {
+			xCoords[i] = points.get(i).x;
+			yCoords[i] = points.get(i).y;
+		}
+		g.drawPolyline(xCoords, yCoords, points.size());
+	}
+
+	@Override
+	public void setCorners(int x, int y, int x1, int y1) {
+		// Not applicable to polyline, but in interface so need to put it here
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Point p : points) {
+			sb.append(p.x).append(",");
+		}
+		sb.append(" ");
+		for (Point p : points) {
+			sb.append(p.y).append(",");
+		}
+		return "polyline " + sb + " color: " + color.getRGB() + " not -1";
+	}
+
+	private void updateCoordinates() {
+		coordinates = new int[points.size() * 2];
+		for (int i = 0; i < points.size(); i++) {
+			coordinates[i * 2] = points.get(i).x;
+			coordinates[i * 2 + 1] = points.get(i).y;
+		}
+	}
+}
